@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OWNER MARUF - Sequence Plus Pattern Analyzer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #08090c;
+            color: #d1d5db;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #111827, #08090c);
+            border-bottom: 2px solid #f59e0b;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.2);
+        }
+
+        header h1 {
+            color: #f59e0b;
+            font-size: 22px;
+            letter-spacing: 1px;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 0 15px 40px 15px;
+        }
+
+        .control-card {
+            background: #111827;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+        }
+
+        .stats-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-box span.title {
+            font-size: 11px;
+            color: #f59e0b;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-box span.val {
+            font-size: 18px;
+            color: #ffffff;
+            font-weight: 900;
+            font-family: monospace;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            color: #ffffff;
+            border: 1px solid #f59e0b;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: #f59e0b;
+            color: #000000;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000000;
+        }
+
+        .btn-clear {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .btn-clear:hover {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #f59e0b;
+            margin: 25px 0 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* প্লাস যুক্ত গ্রিড ডিসপ্লে (0+0 to 9+9) */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .pair-card {
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pair-num {
+            font-family: monospace;
+            font-size: 15px;
+            font-weight: 900;
+            color: #f59e0b;
+        }
+
+        .pair-pred {
+            font-size: 11px;
+            font-weight: 900;
+            padding: 3px 8px;
+            border-radius: 5px;
+        }
+
+        .bg-big { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .bg-small { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+
+        .table-container {
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        th {
+            background: #08090c;
+            color: #f59e0b;
+            padding: 12px 10px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(245, 158, 11, 0.3);
+        }
+
+        td {
+            padding: 10px;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-family: monospace;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .num-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .green { background: radial-gradient(circle at 30% 30%, #34d399, #059669); }
+        .red { background: radial-gradient(circle at 30% 30%, #f87171, #dc2626); }
+        .violet { background: radial-gradient(circle at 30% 30%, #a78bfa, #7c3aed); }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #f59e0b;
+            color: #000000;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 800;
+            box-shadow: 0 5px 20px rgba(245, 158, 11, 0.6);
+            display: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>OWNER MARUF - PLUS PATTERN ANALYZER</h1>
+        <p>0+0 to 9+9 Single Most Frequent Digit Prediction Model</p>
+    </header>
+
+    <div class="container">
+        <div class="control-card">
+            <div class="stats-info">
+                <div class="stat-box">
+                    <span class="title">STORED HISTORY</span>
+                    <span class="val" id="totalCount">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="title">LATEST PAIR</span>
+                    <span class="val" id="latestPair">--</span>
+                </div>
+                <div class="stat-box">
+                    <span class="title">NEXT PREDICTION</span>
+                    <span class="val" id="nextPredText" style="color:#f59e0b;">ANALYZING</span>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-copy" onclick="copyResultsToClipboard()">📋 COPY ALL RESULTS</button>
+                <button class="btn btn-clear" onclick="clearStoredHistory()">🗑️ CLEAR</button>
+            </div>
+        </div>
+
+        <!-- 0+0 to 9+9 Pattern Section -->
+        <div class="section-title">
+            <span>0+0 TO 9+9 PATTERN DATABASE</span>
+            <span style="font-size:11px; color:#9ca3af; font-weight:normal;">(সর্বোচ্চ আসা একক সংখ্যার ওপর ভিত্তি করে তৈরি)</span>
+        </div>
+        <div class="grid-container" id="gridContainer">
+            <!-- JavaScript 0+0 to 9+9 রেন্ডার করবে -->
+        </div>
+
+        <div class="section-title">
+            <span>COLLECTED DRAW HISTORY</span>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>PERIOD NUMBER</th>
+                        <th>DRAW NUMBER</th>
+                        <th>SIZE</th>
+                        <th>COLOR</th>
+                    </tr>
+                </thead>
+                <tbody id="resultTableBody">
+                    <tr>
+                        <td colspan="5" style="padding: 30px; color: #f59e0b;">ডাটা লোড হচ্ছে...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">কপি করা হয়েছে!</div>
+
+    <script>
+        const API_BASE = 'https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json';
+        const STORAGE_KEY = 'om_wingo_permanent_database';
+        
+        let permanentDatabase = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        let sequenceDigitStats = {};
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2200);
+        }
+
+        function getColorBadge(num) {
+            if (num === 0 || num === 5) return 'violet';
+            return num % 2 === 1 ? 'green' : 'red';
+        }
+
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(permanentDatabase));
+        }
+
+        // 0+0 থেকে 9+9 অ্যালগরিদম (সবচেয়ে বেশি আসা একক ডিজিটের উপর ভিত্তি করে)
+        function analyzeSequencePatterns() {
+            sequenceDigitStats = {};
+
+            // 00 থেকে 99 ট্র্যাকিং অবজেক্ট (প্রত্যেক ডিজিট 0-9 কতবার আসছে তা কাউন্ট হবে)
+            for (let d1 = 0; d1 <= 9; d1++) {
+                for (let d2 = 0; d2 <= 9; d2++) {
+                    const key = `${d1}+${d2}`;
+                    sequenceDigitStats[key] = { 0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
+                }
+            }
+
+            const sortedAsc = permanentDatabase.slice().reverse();
+
+            // অতীত ইতিহাস স্ক্যান করে পরবর্তী ১টি ডিজিট গোনা
+            for (let i = 0; i < sortedAsc.length - 2; i++) {
+                const n1 = parseInt(sortedAsc[i].number);
+                const n2 = parseInt(sortedAsc[i+1].number);
+                const nextNum = parseInt(sortedAsc[i+2].number);
+
+                const pairKey = `${n1}+${n2}`;
+                if (sequenceDigitStats[pairKey] && !isNaN(nextNum)) {
+                    sequenceDigitStats[pairKey][nextNum]++;
+                }
+            }
+
+            renderGrid();
+        }
+
+        // গ্রিডে 0+0 থেকে 9+9 রেন্ডার
+        function renderGrid() {
+            const container = document.getElementById('gridContainer');
+            let html = '';
+
+            for (let d1 = 0; d1 <= 9; d1++) {
+                for (let d2 = 0; d2 <= 9; d2++) {
+                    const key = `${d1}+${d2}`;
+                    const digitCounts = sequenceDigitStats[key] || {};
+
+                    // সবচেয়ে বেশিবার ড্র হওয়া সংখ্যাটি বের করা
+                    let maxDigit = d2; // ডিফল্ট
+                    let maxCount = -1;
+
+                    for (let digit = 0; digit <= 9; digit++) {
+                        if ((digitCounts[digit] || 0) > maxCount) {
+                            maxCount = digitCounts[digit] || 0;
+                            maxDigit = digit;
+                        }
+                    }
+
+                    // সেই ১টি সর্বাধিক নম্বর যদি ৫ বা তার বেশি হয় তবে BIG, অন্যথায় SMALL
+                    let predText = maxDigit >= 5 ? 'BIG' : 'SMALL';
+                    let predClass = maxDigit >= 5 ? 'bg-big' : 'bg-small';
+
+                    html += `
+                        <div class="pair-card">
+                            <span class="pair-num">${key}</span>
+                            <span class="pair-pred ${predClass}">${predText}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            container.innerHTML = html;
+
+            // কারেন্ট পেয়ারের পরবর্তী প্রেডিকশন রেন্ডার
+            if (permanentDatabase.length >= 2) {
+                const last1 = parseInt(permanentDatabase[0].number);
+                const last2 = parseInt(permanentDatabase[1].number);
+                const currentPairKey = `${last2}+${last1}`;
+                
+                document.getElementById('latestPair').innerText = currentPairKey;
+                
+                const currentCounts = sequenceDigitStats[currentPairKey];
+                if (currentCounts) {
+                    let topDigit = last1;
+                    let topCount = -1;
+                    for (let d = 0; d <= 9; d++) {
+                        if (currentCounts[d] > topCount) {
+                            topCount = currentCounts[d];
+                            topDigit = d;
+                        }
+                    }
+
+                    const nextPred = topDigit >= 5 ? 'BIG' : 'SMALL';
+                    document.getElementById('nextPredText').innerText = nextPred;
+                    document.getElementById('nextPredText').style.color = nextPred === 'BIG' ? '#34d399' : '#f87171';
+                }
+            }
+        }
+
+        async function fetchAndMergeLiveData() {
+            try {
+                const fetchPromises = [];
+                for (let page = 1; page <= 10; page++) {
+                    fetchPromises.push(
+                        fetch(`${API_BASE}?pageNo=${page}&pageSize=30`).then(res => res.json())
+                    );
+                }
+
+                const results = await Promise.all(fetchPromises);
+                let fetchedItems = [];
+
+                results.forEach(res => {
+                    if (res && res.data && res.data.list) {
+                        fetchedItems = fetchedItems.concat(res.data.list);
+                    }
+                });
+
+                let newAdditions = 0;
+                fetchedItems.forEach(item => {
+                    const exists = permanentDatabase.some(stored => stored.issueNumber === item.issueNumber);
+                    if (!exists) {
+                        permanentDatabase.push(item);
+                        newAdditions++;
+                    }
+                });
+
+                if (newAdditions > 0 || permanentDatabase.length > 0) {
+                    permanentDatabase.sort((a, b) => b.issueNumber.localeCompare(a.issueNumber));
+                    saveToStorage();
+                }
+
+                analyzeSequencePatterns();
+                renderTable();
+
+            } catch (error) {
+                console.error("API Fetch Error:", error);
+                analyzeSequencePatterns();
+                renderTable();
+            }
+        }
+
+        function renderTable() {
+            const tableBody = document.getElementById('resultTableBody');
+            document.getElementById('totalCount').innerText = permanentDatabase.length;
+
+            if (permanentDatabase.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" style="padding: 30px; color: #ef4444;">ডাটাবেসে কোনো রেজাল্ট নেই। সিঙ্ক হচ্ছে...</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            permanentDatabase.forEach((item, index) => {
+                const num = parseInt(item.number);
+                const bs = num >= 5 ? 'BIG' : 'SMALL';
+                const color = getColorBadge(num);
+
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td style="color: #f59e0b; font-weight: bold;">${item.issueNumber}</td>
+                        <td>
+                            <span class="num-badge ${color}">${num}</span>
+                        </td>
+                        <td>
+                            <span class="type-badge ${bs === 'BIG' ? 'bg-big' : 'bg-small'}">${bs}</span>
+                        </td>
+                        <td style="text-transform: uppercase; font-weight: bold; color: ${color === 'green' ? '#34d399' : (color === 'red' ? '#f87171' : '#a78bfa')}">
+                            ${color}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableBody.innerHTML = html;
+        }
+
+        function copyResultsToClipboard() {
+            if (permanentDatabase.length === 0) {
+                showToast("কপি করার মতো কোনো ডাটা নেই!");
+                return;
+            }
+
+            let formattedText = `OWNER MARUF - STORED RESULTS & 0+0 TO 9+9 PATTERNS (TOTAL: ${permanentDatabase.length})\n\n`;
+            permanentDatabase.forEach(item => {
+                const num = parseInt(item.number);
+                const bs = num >= 5 ? 'BIG' : 'SMALL';
+                formattedText += `Period: ${item.issueNumber} | Result: ${num} (${bs})\n`;
+            });
+
+            navigator.clipboard.writeText(formattedText).then(() => {
+                showToast(`সকল ${permanentDatabase.length}টি রেজাল্ট কপি করা হয়েছে! 📋`);
+            }).catch(err => {
+                console.error("Copy Error:", err);
+            });
+        }
+
+        function clearStoredHistory() {
+            if (confirm("আপনি কি নিশ্চিত যে জমানো সকল রেজাল্ট মুছে ফেলতে চান?")) {
+                permanentDatabase = [];
+                localStorage.removeItem(STORAGE_KEY);
+                analyzeSequencePatterns();
+                renderTable();
+                showToast("ডাটাবেস খালি করা হয়েছে!");
+            }
+        }
+
+        analyzeSequencePatterns();
+        renderTable();
+        fetchAndMergeLiveData();
+        setInterval(fetchAndMergeLiveData, 3000);
+    </script>
+</body>
+</html>
